@@ -104,3 +104,4 @@ print("Menor caminho:", path)
 
 print("Árvore de busca (Matriz):", dict(treeM))
 print("Menor caminho (Matriz):", pathM)
+print("")

@@ -1,6 +1,7 @@
 import tkinter as tk
 import random
 from collections import deque
+from tkinter import PhotoImage
 
 
 class PlanoCartesianoApp:
@@ -11,6 +12,7 @@ class PlanoCartesianoApp:
         self.canvas = tk.Canvas(master, width=largura, height=altura)
         self.canvas.pack()
 
+        self.imagem_motoboy = tk.PhotoImage(file="./boy.ppm")
 
         self.largura = largura
         self.altura = altura
@@ -109,9 +111,10 @@ class PlanoCartesianoApp:
                 self.pontos_entregues.append(ponto_entrega)
                 self.pontos[y][x] = "entregue"
 
-                self.canvas.create_rectangle(x * self.tamanho_celula, y * self.tamanho_celula,
-                                            (x + 1) * self.tamanho_celula, (y + 1) * self.tamanho_celula,
-                                            fill="green")
+                self.canvas.create_image((x * self.tamanho_celula) + (self.tamanho_celula // 2), 
+                                        (y * self.tamanho_celula) + (self.tamanho_celula // 2), 
+                                        anchor=tk.CENTER, image=self.imagem_motoboy)
+
 
                 self.pontos_entrega.pop(i)
                 break

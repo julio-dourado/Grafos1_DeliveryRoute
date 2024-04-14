@@ -8,6 +8,7 @@ Temas:
 ## Alunos
 |Matrícula | Aluno |
 | -- | -- |
+| 22/2037657  |  Arthur Alves |
 | 21/1031495  |  Samuel Ricardo |
 | 21/1030809  |  Julio Cesar |
 

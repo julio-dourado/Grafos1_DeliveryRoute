@@ -10,24 +10,25 @@ Temas:
 | -- | -- |
 | 22/2037657  |  Arthur Alves |
 | 21/1031495  |  Samuel Ricardo |
-| 21/1030809  |  Julio Cesar |
 
 ## Sobre 
-Descreva os objetivos do seu projeto e como ele funciona. 
+O objetivo do nosso projeto é poder colocar em um plano cartesiano um motoboy e mais 3 pontos de entrega, a partir do ponto de partida uma bfs deve obter o menor caminho até a primeira entrega do motoboy e a partir dai o motoboy deve ir de uma entrega até outra também sempre pela de menor caminho.
 
 ## Screenshots
-Adicione 3 ou mais screenshots do projeto em funcionamento.
+![Exemplo da seleção do motoboy](/images/exemp1.jpeg)
+![Exemplo da seleção dos pontos de entrega](/images/exemp2.jpeg)
+![Exemplo do algoritmo apos finalizado](/images/exemp3.jpeg)
 
 ## Instalação 
 **Linguagem**: python<br>
 **Framework**: (caso exista)<br>
-Descreva os pré-requisitos para rodar o seu projeto e os comandos necessários.
+Os pré requisitos para rodar o projeto é ter o python e o tkinter baixados em sua maquina.
+no terminal no caminho do nosso repositorio você deve digitar python3 grafos1.py
 
 ## Uso 
-Explique como usar seu projeto caso haja algum passo a passo após o comando de execução.
-
-## Outros 
-Quaisquer outras informações sobre seu projeto podem ser descritas abaixo.
+ * apertar o botão para selecionar o ponto de partida do motoboy
+ * apertar o botão para selecionar os pontos de entrega do motoboy
+ * apertar o botão para iniciar o programa
 
 
 

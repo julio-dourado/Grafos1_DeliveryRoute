@@ -9,10 +9,23 @@ class PlanoCartesianoApp:
         self.master = master
         master.title("Plano Cartesiano")
 
+        self.control_frame = tk.Frame(master)
+        self.control_frame.pack(fill=tk.X)
+
         self.canvas = tk.Canvas(master, width=largura, height=altura)
         self.canvas.pack()
 
         self.imagem_motoboy = tk.PhotoImage(file="./boy.gif")
+
+        self.btn_motoboy = tk.Button(self.control_frame, text="Selecionar ponto inicial do motoboy", command=self.selecionar_motoboy)
+        self.btn_motoboy.pack(side=tk.LEFT, padx=5)
+
+        self.btn_entrega = tk.Button(self.control_frame, text="Selecionar pontos de entrega", command=self.selecionar_entregas)
+        self.btn_entrega.pack(side=tk.LEFT, padx=5)
+
+        self.btn_iniciar = tk.Button(self.control_frame, text="Iniciar entrega", command=self.iniciar_entrega)
+        self.btn_iniciar.pack(side=tk.LEFT, padx=5)
+        self.btn_iniciar['state'] = tk.DISABLED
 
         self.largura = largura
         self.altura = altura
@@ -22,48 +35,62 @@ class PlanoCartesianoApp:
         self.colunas = largura // tamanho_celula
 
         self.pontos = [[0] * self.colunas for _ in range(self.linhas)]
-
-        # Adicionando o ponto do motoboy em um local aleatório
-        self.motoboy_x = random.randint(0, self.colunas - 1)
-        self.motoboy_y = random.randint(0, self.linhas - 1)
-        self.pontos[self.motoboy_y][self.motoboy_x] = "motoboy"
-
-        # Adicionando 3 pontos de entrega aleatórios
+        self.motoboy_x = self.motoboy_y = None
         self.pontos_entrega = []
         self.pontos_entregues = []
-        while len(self.pontos_entrega) < 3:
-            x = random.randint(0, self.colunas - 1)
-            y = random.randint(0, self.linhas - 1)
-            if (x, y) != (self.motoboy_x, self.motoboy_y) and (x, y) not in self.pontos_entrega:
-                self.pontos_entrega.append((x, y))
-                self.pontos[y][x] = "entrega"
 
-        # Desenhando o plano cartesiano
+        self.desenhar_plano_cartesiano()
+
+        self.selecionando_motoboy = False
+        self.selecionando_entregas = False
+        self.canvas.bind("<Button-1>", self.canvas_click)
+
+
+    def desenhar_plano_cartesiano(self):
         for linha in range(self.linhas + 1):
-            y = linha * tamanho_celula
-            self.canvas.create_line(0, y, largura, y, fill="black")
+            y = linha * self.tamanho_celula
+            self.canvas.create_line(0, y, self.largura, y, fill="black")
 
         for coluna in range(self.colunas + 1):
-            x = coluna * tamanho_celula
-            self.canvas.create_line(x, 0, x, altura, fill="black")
+            x = coluna * self.tamanho_celula
+            self.canvas.create_line(x, 0, x, self.altura, fill="black")
+    
+    def canvas_click(self, event):
+        coluna = event.x // self.tamanho_celula
+        linha = event.y // self.tamanho_celula
 
-        # Desenhando os pontos
-        for y, linha in enumerate(self.pontos):
-            for x, ponto in enumerate(linha):
-                if ponto == "motoboy":
-                    self.canvas.create_rectangle(x * tamanho_celula, y * tamanho_celula,
-                                                 (x + 1) * tamanho_celula, (y + 1) * tamanho_celula,
-                                                 fill="red")
-                elif ponto == "entrega":
-                    self.canvas.create_rectangle(x * tamanho_celula, y * tamanho_celula,
-                                                 (x + 1) * tamanho_celula, (y + 1) * tamanho_celula,
-                                                 fill="blue")
+        if self.selecionando_motoboy:
+            self.motoboy_x, self.motoboy_y = coluna, linha
+            self.canvas.create_rectangle(coluna * self.tamanho_celula, linha * self.tamanho_celula,
+                                         (coluna + 1) * self.tamanho_celula, (linha + 1) * self.tamanho_celula,
+                                         fill="red")
+            self.selecionando_motoboy = False
+            self.btn_motoboy['state'] = tk.DISABLED
 
-        # Calculando e exibindo os caminhos        
-        menor_caminho = self.encontrar_menor_caminho()
-        if menor_caminho:
-            self.movimentos = deque(menor_caminho)
-            self.mover_motoboy()
+        elif self.selecionando_entregas:
+            if (coluna, linha) != (self.motoboy_x, self.motoboy_y):
+                self.pontos_entrega.append((coluna, linha))
+                self.canvas.create_rectangle(coluna * self.tamanho_celula, linha * self.tamanho_celula,
+                                             (coluna + 1) * self.tamanho_celula, (linha + 1) * self.tamanho_celula,
+                                             fill="blue")
+            if len(self.pontos_entrega) >= 3:
+                self.selecionando_entregas = False
+                self.btn_entrega['state'] = tk.DISABLED
+                self.btn_iniciar['state'] = tk.NORMAL
+
+    def selecionar_motoboy(self):
+        self.selecionando_motoboy = True
+
+    def selecionar_entregas(self):
+        self.selecionando_entregas = True
+
+    def iniciar_entrega(self):
+        if self.motoboy_x is not None and self.pontos_entrega:
+            menor_caminho = self.encontrar_menor_caminho()
+            if menor_caminho:
+                self.movimentos = deque(menor_caminho)
+                self.mover_motoboy()
+
 
     def encontrar_menor_caminho(self):
         menor_caminho = None
@@ -77,8 +104,8 @@ class PlanoCartesianoApp:
 
     def mover_motoboy(self):
         if self.movimentos:
-            self.rastro() # Posição anterior antes de atualizar abaixo, pintar o rastro
-            self.motoboy_x, self.motoboy_y = self.movimentos.popleft() # Atualiza a posição global do motoboy com o próximo elemento da fila
+            self.rastro()
+            self.motoboy_x, self.motoboy_y = self.movimentos.popleft() 
             self.atualizar_desenho()
             self.master.after(500, self.mover_motoboy)
         if len(self.movimentos) == 0:
@@ -86,7 +113,7 @@ class PlanoCartesianoApp:
 
 
     def atualizar_desenho(self):
-        self.pontos[self.motoboy_y][self.motoboy_x] = "motoboy"  # Adicionar o motoboy ao próximo ponto
+        self.pontos[self.motoboy_y][self.motoboy_x] = "motoboy"  
         for y, linha in enumerate(self.pontos):
             for x, ponto in enumerate(linha):
                 if ponto == "motoboy":
@@ -101,7 +128,7 @@ class PlanoCartesianoApp:
                     self.canvas.create_rectangle(x * self.tamanho_celula, y * self.tamanho_celula,
                                                  (x + 1) * self.tamanho_celula, (y + 1) * self.tamanho_celula,
                                                  fill="gray")
-                    self.pontos[self.motoboy_y][self.motoboy_x] = 0  # Remover o motoboy do ponto atual 
+                    self.pontos[self.motoboy_y][self.motoboy_x] = 0  
 
                     
     def entregue(self):
@@ -113,7 +140,7 @@ class PlanoCartesianoApp:
 
                 self.canvas.create_image((x * self.tamanho_celula) + (self.tamanho_celula // 2), 
                                         (y * self.tamanho_celula) + (self.tamanho_celula // 2), 
-                                        anchor=tk.CENTER, image=self.imagem_motoboy)
+                                        anchor=tk.CENTER)
 
 
                 self.pontos_entrega.pop(i)
@@ -141,7 +168,7 @@ class PlanoCartesianoApp:
                 continue
             visitado[y][x] = True
 
-            for dx, dy in [(0, -1), (0, 1), (-1, 0), (1, 0)]:  # Não permite movimento na diagonal
+            for dx, dy in [(0, -1), (0, 1), (-1, 0), (1, 0)]:  
                 novo_x, novo_y = x + dx, y + dy
                 if 0 <= novo_x < self.colunas and 0 <= novo_y < self.linhas and not visitado[novo_y][novo_x]:
                     fila.append((novo_x, novo_y, caminho + [(x, y)]))

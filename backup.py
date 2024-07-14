@@ -62,7 +62,7 @@ class PlanoCartesianoApp:
         # Calculando e exibindo os caminhos        
         menor_caminho = self.encontrar_menor_caminho()
         if menor_caminho:
-            self.movimentos = deque(menor_caminho)
+            self.movimentos = deque(menor_caminho)  
             self.mover_motoboy()
 
     def encontrar_menor_caminho(self):
